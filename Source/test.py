@@ -1,25 +1,16 @@
-from model.database_manager import DatabaseManager
-from datetime import datetime
+# from model.facial_expression import ExpressionDetector
+# import model.settings as settings
+# import os
+#
+# ed = ExpressionDetector()
+# test_file_name_list = [f for f in os.listdir(settings.face_training_image_path) if f !='.DS_Store']
+# test_file_path_list = [os.path.join(settings.face_training_image_path, f) for f in test_file_name_list]
+#
+# for f in test_file_path_list:
+#     ed.test_emotion(f)
 
-db = DatabaseManager.getInstance()
+import model.database_manager as DB
 
-# p = db.writePicture(pic_file_path='abjuu/abc.png', thumbnail_path='jhhhzzj/hh.png', add_date=datetime.now(), created_data=datetime.now())
-# print(p)
-
-# t = db.updateFaceInPic(person_tag_id=1, emotion_tag_id=3, picture_id=2)
-# print(t)
-
-f = db.findPictureWithFace(person_tag_id=1)
-for h in f:
-    print(h)
-
-print('----')
-
-f = db.findPictureWithEmotion(emotion_tag_id=3)
-for h in f:
-    print(h)
-
-
-
-db.closeConnection()
-
+pictures = DB.getPicWithPersonAndEmotion(17, 'happy')
+for p in pictures:
+    print(p)
