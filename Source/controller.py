@@ -68,6 +68,8 @@ class FAController:
     def updateFaceCB(self):
         self.main_window.face_filter_cb.clear()
         self.PL.loadPersonList()
+        if self.PL.personList is None:
+            return
         for p in self.PL.personList:
             self.main_window.face_filter_cb.addItem(p.name, p.id)
 

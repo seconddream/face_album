@@ -22,6 +22,8 @@ class FAPersonWidget(QWidget, Ui_PersonWidget):
 
     def updatePerson(self):
         person = self.person_list.currentItem().data(Qt.UserRole)
+        if person is None:
+            return
         new_name = self.name_cb.currentText()
         if new_name != '' and new_name is not None and person is not None:
             person.name = new_name
