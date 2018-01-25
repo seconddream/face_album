@@ -8,18 +8,22 @@ from model.face_recognizer import FaceRecognizer
 from model.crop import FaceCropper
 from model.facial_expression import ExpressionDetector
 
-
+# the main model of the app, the libaray
 class PhotoLibrary:
 
     def __init__(self):
         self.faceCropper = FaceCropper()
+        # the variable that holds all the pictures in the library
         self.library = None
+        # the variable that holds all the people in the library
         self.personList = None
         self.faceRecognizer = FaceRecognizer()
+        # load the library
         self.loadLibrary()
+        # load the person info
         self.loadPersonList()
         self.expressionDetector = ExpressionDetector()
-
+# the function follows use the database_manager to do database task
     def loadLibrary(self):
         self.library = DB.getAllPictures()
 
@@ -115,10 +119,7 @@ class PhotoLibrary:
 
             # determine emotion
             emotion = self.expressionDetector.test_emotion(face_image_file_path)
-
             # write to database
-
-
             DB.createFaceInPic(picture.id, int(x), int(y), int(w), int(h), face_image_file_path, emotion)
 
 

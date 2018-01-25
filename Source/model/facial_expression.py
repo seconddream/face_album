@@ -3,7 +3,7 @@ import os
 import numpy as np
 import tensorflow as tf
 
-
+# this class is for emotion classification
 class ExpressionDetector:
 
     def __init__(self):
@@ -16,7 +16,7 @@ class ExpressionDetector:
         self.input_mean = 128
         self.input_layer = 'input'
         self.output_layer = 'final_result'
-
+        # load the pre trained tensor flow model
         self.model_file = os.path.join('data', 'retrained_graph.pb')
         self.graph = tf.Graph()
         self.graph_def = tf.GraphDef()
@@ -24,13 +24,13 @@ class ExpressionDetector:
             self.graph_def.ParseFromString(f.read())
         with self.graph.as_default():
             tf.import_graph_def(self.graph_def)
-
+        # load the labels of the model
         self.label_file = os.path.join('data', 'retrained_labels.txt')
         self.labels = []
         proto_as_ascii_lines = tf.gfile.GFile(self.label_file).readlines()
         for l in proto_as_ascii_lines:
             self.labels.append(l.rstrip())
-
+    # get tensors from a face image
     def load_tensor_from_image_file(self, file_name):
         input_name = 'file_reader'
         output_name = "normalized"
@@ -43,7 +43,7 @@ class ExpressionDetector:
         sess = tf.Session()
         result = sess.run(normalized)
         return result
-
+    # predict the emotion with the tensors.
     def test_emotion(self, file_path):
         t = self.load_tensor_from_image_file(file_path)
         input_name = "import/" + self.input_layer

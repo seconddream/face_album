@@ -3,7 +3,7 @@ from model.person import Person
 from model.picture import Picture
 from model.face import Face
 
-
+# this modual is for database operations
 conn = sqlite3.connect(os.path.join('data','db', 'fa_db.db'))
 cursor = conn.cursor()
 
@@ -11,6 +11,7 @@ def closeConnection():
     if conn:
         conn.close()
 
+# search the database for pictures with persion id and emotion
 def getPicWithPersonAndEmotion(id, emotion):
     picture_list = []
     try:
@@ -36,7 +37,7 @@ def getPicWithPersonAndEmotion(id, emotion):
     except Exception as err:
         print(f'[DatabaseManager/getPicWithPersonAndEmotion]: {err}')
         return None
-
+# create a new person
 def createNewPerson(name, thumbnail_path):
     try:
         cursor.execute('INSERT INTO person_tag VALUES (NULL,?,?)',(name, thumbnail_path))
@@ -45,7 +46,7 @@ def createNewPerson(name, thumbnail_path):
     except Exception as err:
         print(f'[DatabaseManager/write_person]: {err}')
         return None
-
+# get all the person that is recognized by the face recognitin model
 def getAllPerson():
     person_list = []
     try:
@@ -63,7 +64,7 @@ def getAllPerson():
         print(f'[DatabaseManager/getAllPerson]: {err}')
         return None
 
-
+# change a person's information
 def updatePerson(person):
     try:
         cursor.execute('UPDATE person_tag SET name=? WHERE id=?', (person.name, person.id))
@@ -71,7 +72,7 @@ def updatePerson(person):
     except Exception as err:
         print(f'[DatabaseManager/UpdatePerson]: {err}')
         return None
-
+# delete a person in the database
 def deletePerson(person):
     try:
         cursor.execute('UPDATE face_in_pic SET person_tag_id=?, verified=? WHERE person_tag_id=?', (None, -1, person.id))
@@ -80,7 +81,7 @@ def deletePerson(person):
     except Exception as err:
         print(f'[DatabaseManager/deletePerson]: {err}')
 
-
+# get a person object by id
 def getPersonById(id):
     if id:
         try:
@@ -97,7 +98,7 @@ def getPersonById(id):
     else:
         print(f'[DatabaseManager/get_person_by_id]: id missing')
         return None
-
+# get a person object by name
 def getPersonByName(name):
     if name:
         try:
@@ -116,7 +117,7 @@ def getPersonByName(name):
     else:
         print(f'[DatabaseManager/getPersonByName]: name missing')
         return None
-
+# create a picture, store its origial and thumbnail file path
 def createPicture(file_path, thumbnail_path, add_date):
     if file_path and thumbnail_path and add_date:
         try:
@@ -129,7 +130,7 @@ def createPicture(file_path, thumbnail_path, add_date):
             return None
     else:
         print(f'[DatabaseManager/createPicture]: arguments not complete')
-
+# retirve all the pictures
 def getAllPictures():
     picture_list = []
     try:
@@ -146,7 +147,7 @@ def getAllPictures():
     except Exception as err:
         print(f'[DatabaseManager/getAllPic]: {err}')
         return None
-
+# retirve a picture by id
 def getPictureByID(pic_id):
     try:
         cursor.execute('SELECT * FROM pictures WHERE id =?', (pic_id,))
@@ -159,7 +160,7 @@ def getPictureByID(pic_id):
     except Exception as err:
         print(f'[DatabaseManager/getAllPic]: {err}')
         return None
-
+# create a face in picture entry, each entry has the face pic position size info and the trainning sample path, and enmotion
 def createFaceInPic(picture_id=None, x=None, y=None, w=None, h=None, sample_path=None, emotion=None):
     if picture_id:
         try:
@@ -173,7 +174,7 @@ def createFaceInPic(picture_id=None, x=None, y=None, w=None, h=None, sample_path
     else:
         print(f'[DatabaseManager/update_face_in_pic]: picture must not be None')
         return None
-
+# retirve all the face detected in the library
 def getAllFaceInPic():
     face_list = []
     try:
@@ -191,14 +192,14 @@ def getAllFaceInPic():
         print(f'[DatabaseManager/UpdatePerson]: {err}')
         return None
 
-
+# delete a face in picture entry
 def deleteFaceInPic(face_id):
     try:
         cursor.execute('DELETE FROM face_in_pic WHERE face_in_pic.id = ?', (face_id,))
         conn.commit()
     except Exception as err:
         print(f'[DatabaseManager/deleteFaceInPic]: {err}')
-
+# update a face in picture entry information
 def updateFaceInPic(face):
     try:
         cursor.execute('UPDATE face_in_pic SET person_tag_id=?, emotion=?, verified=? WHERE id=?', (face.person_id, face.emotion, face.verified, face.id))
@@ -206,7 +207,7 @@ def updateFaceInPic(face):
     except Exception as err:
         print(f'[DatabaseManager/updateFaceInPic]: {err}')
         return None
-
+# get all the face in one picture by id
 def getFaceInPic(pic_id):
     if pic_id:
         face_list = []
@@ -224,78 +225,5 @@ def getFaceInPic(pic_id):
     else:
         print(f'[DatabaseManager/get_face_in_pic]: pic_id must not be none')
         return None
-
-
-
-
-# class DatabaseManager:
-#
-#     def __init__(self):
-#         try:
-#             self.conn = sqlite3.connect(os.path.join('data', 'db', 'fa_db.db'))
-#             self.cursor = self.conn.cursor()
-#         except Exception as err:
-#             print(f'[DatabaseManager]: {err}')
-#
-#     def closeConnection(self):
-#         if self.conn:
-#             self.conn.close()
-#
-#
-#     def findPictureWithFace(self, person_tag_id):
-#         if person_tag_id:
-#             try:
-#                 self.cursor.execute('''
-#                         SELECT
-#                           face_in_pic.*,
-#                           person_tag.first_name,
-#                           person_tag.last_name,
-#                           person_tag.thumbnail_path,
-#                           pictures.pic_file_path,
-#                           pictures.thumbnail_path,
-#                           pictures.add_date,
-#                           pictures.created_data
-#                         FROM
-#                           ((face_in_pic
-#                             LEFT JOIN person_tag)
-#                             LEFT JOIN pictures)
-#                             WHERE face_in_pic.person_tag_id = ?
-#                             AND face_in_pic.person_tag_id == person_tag.id
-#                             AND face_in_pic.picture_id == pictures.id
-#                             GROUP BY  face_in_pic.id
-#                             ''',
-#                             (person_tag_id,))
-#                 self.conn.commit()
-#                 rows = self.cursor.fetchall()
-#                 return rows
-#             except Exception as err:
-#                 print(f'[DatabaseManager/find_picture_with_face]: {err}')
-#                 return False
-#
-#     def findPictureWithEmotion(self, emotion):
-#         if emotion:
-#             try:
-#                 self.cursor.execute('''
-#                     SELECT
-#                       face_in_pic.*,
-#                       person_tag.first_name,
-#                       person_tag.last_name,
-#                       person_tag.thumbnail_path,
-#                       pictures.pic_file_path,
-#                       pictures.thumbnail_path,
-#                       pictures.add_date,
-#                       pictures.created_data
-#                     FROM
-#                       ((face_in_pic
-#                           LEFT JOIN person_tag ON face_in_pic.id = person_tag.id)
-#                           LEFT JOIN pictures ON face_in_pic.id = pictures.id)
-#                     WHERE face_in_pic.emotion = ?''',
-#                     (emotion,))
-#                 self.conn.commit()
-#                 rows = self.cursor.fetchall()
-#                 return rows
-#             except Exception as err:
-#                 print(f'[DatabaseManager/find_picture_with_emotion]: {err}')
-#                 return False
 
 

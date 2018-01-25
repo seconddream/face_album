@@ -10,7 +10,7 @@ from model.face_recognizer import FaceRecognizer
 import model.settings as settings
 import os
 
-
+# main controller for the app, connect all the event in GUI to logic functions.
 class FAController:
     def __init__(self, app):
         self.PL = PhotoLibrary()
@@ -31,8 +31,11 @@ class FAController:
         self.face_list_item_update_event = None
 
         self.connectEvent()
+        # load the thumbnails of all the pictures in the db at start up
         self.updateThumbnailsList()
+        # load all the recognized face at start up
         self.updateFaceCB()
+        # set the emotion drop menu to the inital state (include 3 emtions, sad, happy, surprise)
         self.updateEmotionCB()
 
     def connectEvent(self):
@@ -76,7 +79,7 @@ class FAController:
     def returnToFullLibrary(self):
         self.PL.loadLibrary()
         self.updateThumbnailsList()
-
+    # function to run when user want to update the information of a face
     def faceUpdate(self):
         n = self.view_photo_widget.face_list.count()
         for i in range(0,n):
@@ -101,7 +104,7 @@ class FAController:
         face = item.data(Qt.UserRole)
         self.PL.deleteFaceInPic(face.id)
         self.view_photo_widget.face_list.takeItem(self.view_photo_widget.face_list.row(item))
-
+    # show all the face detected in the picture
     def showFaceInPicture(self):
         if self.face_toggled:
             picture_scaled = self.cur_displayed_picture.scaled(self.view_photo_widget.picture_lb.sizeHint(),
@@ -113,6 +116,7 @@ class FAController:
         faces = self.PL.getFacesInPicture(self.cur_displayed_picture_id)
         if faces is None:
             return
+        # add a frame around the face, and a emojie to tell the emotion
         overlay = QPixmap(self.cur_displayed_picture)
         painter = QPainter(overlay)
         pen = QPen()
@@ -129,7 +133,7 @@ class FAController:
         self.view_photo_widget.picture_lb.setPixmap(overlay_scaled)
         self.face_toggled = True
 
-
+    # function for  go into a single picture view
     def displayPicture(self, item):
         pic_id, index = item.data(0)
         picture = self.PL.getPictureWithID(pic_id)
@@ -157,7 +161,7 @@ class FAController:
             self.view_photo_widget.face_list.addItem(face_item)
         self.view_photo_widget.show()
 
-
+    # function for import photos
     def importImages(self):
         fname = QFileDialog.getOpenFileNames(self.main_window, 'Open files')
         if fname[0]:
